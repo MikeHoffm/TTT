@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Tic Tac Toe</title>
+</head>
+<body>
+    <header>
+        <h1>Tic Tac Toe</h1> 
+        <h2 class="game-msg">Game Message</h2>
+    </header>
+    <main>
+        <div class="start-menu">
+            <!-- <h1 class="game-title">Let's Play</h1>
+            <button class='start-btn'>Press To Start</button> -->
+        </div>
+
+        <div class="game-type-menu" style="display:none">
+            <!-- <h1 class="game-type">Game Type</h1>
+            <button class="pvp-game">Player v Player</button> -->
+            <!-- <button class="pvc-game">Player v AI</button> -->
+        </div>
+
+        <div class="player-form">
+            <!-- <h1>Enter Player Names</h1>
+            <form id="form" action="player-form" method="post">
+                <label for="player1">Player 1 (X):</label>
+                <input type="text" id="player1" name="player1" placeholder="Player One" required>
+
+                <label for="player2">Player 2 (O):</label>
+                <input type="text" id="player2" name="player2" placeholder="Player Two" required>
+
+                <button class="submit" type="submit">Submit</button>
+            </form> -->
+        </div>
+         
+         
+         <div class="game-grid">
+            <button class="grid-cell" data-index="0"></button>
+            <button class="grid-cell" data-index="1"></button>
+            <button class="grid-cell" data-index="2"></button>
+            <button class="grid-cell" data-index="3"></button>
+            <button class="grid-cell" data-index="4"></button>
+            <button class="grid-cell" data-index="5"></button>
+            <button class="grid-cell" data-index="6"></button>
+            <button class="grid-cell" data-index="7"></button>
+            <button class="grid-cell" data-index="8"></button>
+        </div>
+         
+       <button class="restart" style="display:none">New Game</button>
+        
+    </main>
+    <footer>
+        <p>Coded by Mike</p>
+    </footer>
+<script src="index.js"></script>
+</body>
+</html>
