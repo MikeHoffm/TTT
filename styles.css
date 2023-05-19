@@ -93,17 +93,25 @@ main{
     color: white;
 }
 
-
 /* Game Board */
  .game-grid {
     display: grid;
     justify-content: center;
     align-content: center;
     grid-template: repeat(3, 100px) / repeat(3, 100px);
+    gap: .6em;
 } 
 
 /* Styling */
-
 .game-msg {
     font-size: .8em;
+}
+
+.grid-cell {
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+    border: .2em solid rgb(235, 230, 230);
+    border-radius: 16px;
+    background-color: rgb(8, 8, 8);
 }
