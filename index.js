@@ -63,36 +63,115 @@ const game = (() => {
     currentPlayer === playerOne ? currentPlayer = playerTwo : currentPlayer = playerOne;
   };
 
-  // winConditions
-  const winConditions = {};
+  // State of Game, updates when win condition has been met
+  let gameOver = false;
+
+  // Retrieve state of Game
+  const getGameOver = () => gameOver;
+
+  // Method to run if a tie or win has been made, ends game functionality for round
+  const endGame = () => {
+    console.log('Game Over');
+    gameOver = true;
+    return (gameOver);
+  };
+
+  const gameTie = () => {
+    console.log('Game Tied');
+    gameOver = 'tied';
+    return (gameOver);
+  };
+
+  // Method to check that a winning move has been made, calls endGame
+  const checkWin = () => {
+    // Check gameBoard Array, if the array items value at the corresponding winCondition index is equal, a win has been made
+    if (!gameBoard.getBoard()[0] == false
+         && gameBoard.getBoard()[0] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[1] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[2] == getCurrentPlayer().marker
+
+        || !gameBoard.getBoard()[3] == false
+         && gameBoard.getBoard()[3] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[4] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[5] == getCurrentPlayer().marker
+
+        || !gameBoard.getBoard()[6] == false
+         && gameBoard.getBoard()[6] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[7] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[8] == getCurrentPlayer().marker
+
+    // Column Wins
+        || !gameBoard.getBoard()[0] == false
+         && gameBoard.getBoard()[0] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[3] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[6] == getCurrentPlayer().marker
+
+        || !gameBoard.getBoard()[1] == false
+         && gameBoard.getBoard()[1] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[4] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[7] == getCurrentPlayer().marker
+
+        || !gameBoard.getBoard()[2] == false
+         && gameBoard.getBoard()[2] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[5] == getCurrentPlayer().marker
+         && gameBoard.getBoard()[8] == getCurrentPlayer().marker
+
+    // Diagonal Wins
+        || !gameBoard.getBoard()[0] == false
+        && gameBoard.getBoard()[0] == getCurrentPlayer().marker
+        && gameBoard.getBoard()[4] == getCurrentPlayer().marker
+        && gameBoard.getBoard()[8] == getCurrentPlayer().marker
+
+       || !gameBoard.getBoard()[2] == false
+        && gameBoard.getBoard()[2] == getCurrentPlayer().marker
+        && gameBoard.getBoard()[4] == getCurrentPlayer().marker
+        && gameBoard.getBoard()[6] == getCurrentPlayer().marker
+    ) {
+      endGame();
+    }
+  };
+
+  // Check for Ties, if all cells are filled and no win has been made, its a tie
+  const checkTie = () => {
+  // if all cells are filled, with no winning combination, a tie has been reached
+  // run gameTied();
+  };
 
   // Starts next round by printing new array, and announcing players turn
   const startNewRound = () => {
-    // log current players turn
-    console.log(`${getCurrentPlayer().name}s turn`);
-    // update the board with newly marked board
+    console.log(gameBoard.getBoard());
+    checkWin();
+    checkTie();
+    if (gameOver == true) {
+      console.log('startNewRound says Game is over. end clickability');
+    } else if (gameOver == 'tied') {
+      console.log('startNewRound says Game is Tied');
+    } else {
+      console.log(`${getCurrentPlayer().name}'s turn`);
+    }
   };
 
   // Plays a round of Tic Tac Toe, marks board with current players token in given index
   // console.log the move made, switch player,
-  // should clear the board, then show updated board
+  // check win conditions
   const playRound = (index) => {
     // place a marker based on the given index, and the currentplayers marker
     gameBoard.placeMarker(getCurrentPlayer().marker, index);
 
     // Check the getValid method from gameboard
-    // if a valid play has been made then switch players
+    // if a valid play has been made then check for win, switch players
     if (gameBoard.getValid() === true) {
+      checkWin();
       switchPlayer();
     }
-
-    // check win conditions, and if a winning move has been display win message
 
     // start next round/log current players turn
     startNewRound();
   };
 
-  return { getCurrentPlayer, switchPlayer, playRound };
+  return {
+    getCurrentPlayer, switchPlayer, playRound, getGameOver,
+  };
 })();
 
 // displayController, reflects changes to the DOM
@@ -105,6 +184,18 @@ const displayController = (() => {
     DOM.gameMsg.innerText = `${game.getCurrentPlayer().name}'s turn`;
   };
 
+  // Game Over Message
+  const gameOverMsg = () => {
+    DOM.gameMsg.innerText = 'Game Over';
+  };
+
+  // End functionality of game when win state has been reached
+  // Change DOM msg
+  const gameOver = () => {
+    if (game.getGameOver() == true) {
+      gameOverMsg();
+    }
+  };
   // Create an array from our DOM gridCell node list to iterate upon
   const gridCellArray = Array.from(DOM.gridCells);
 
@@ -123,6 +214,7 @@ const displayController = (() => {
       game.playRound(cell.dataset.index);
       updateGrid();
       updateGameMsg();
+      gameOver();
     });
   });
 
