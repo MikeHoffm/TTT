@@ -71,7 +71,7 @@ body {
 
 /* Page Layout */
 header {
-    border : 3px solid purple;
+    /* border : 3px solid purple; */
     font-size: 3em;
     gap: .5em;
     display: flex;
@@ -81,7 +81,7 @@ header {
 }
 
 main{
-   border: 3px solid blue; 
+   /* border: 3px solid blue;  */
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -91,6 +91,15 @@ main{
 /* Game Message */
 .game-msg {
     color: white;
+}
+
+/* Intro Form */
+
+.hide {
+    
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
 }
 
 /* Game Board */

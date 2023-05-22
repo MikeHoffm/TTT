@@ -6,6 +6,12 @@ const DOM = {
   gameMsg: document.querySelector('.game-msg'),
   gameGrid: document.querySelector('.game-grid'),
   gridCells: document.querySelectorAll('.grid-cell'),
+  gameType: document.querySelectorAll('.game-type-menu'),
+  pvpBtn: document.querySelectorAll('.pvp-game'),
+  playerForm: document.querySelectorAll('.player-form'),
+  pOneInput: document.getElementById('player1'),
+  pTwoInput: document.getElementById('player2'),
+  formSubmit: document.querySelectorAll('.submit'),
 };
 
 // Gameboard , contains the board we'll make our play on,
@@ -50,8 +56,8 @@ const gameBoard = (() => {
 // Game should control the flow and state of games turns
 // as well as win conditions for the game
 const game = (() => {
-  const playerOne = playerFactory('P One', 'X');
-  const playerTwo = playerFactory('P Two', 'O');
+  const playerOne = playerFactory('User One', 'X');
+  const playerTwo = playerFactory('User Two', 'O');
 
   let currentPlayer = playerOne;
 
@@ -69,13 +75,21 @@ const game = (() => {
   // Retrieve state of Game
   const getGameOver = () => gameOver;
 
-  // Method to run if a tie or win has been made, ends game functionality for round
+  // Variable to fill with winning player
+  let winningPlayer = '';
+
+  // Retrieve winner
+  const getWinner = () => winningPlayer;
+
+  // Method to run if a win has been made
   const endGame = () => {
-    console.log('Game Over');
+    console.log(`${getCurrentPlayer().name} wins `);
+    winningPlayer = getCurrentPlayer().name;
     gameOver = true;
-    return (gameOver);
+    return { gameOver, winningPlayer };
   };
 
+  // Method to log when a tie has been made,
   const gameTie = () => {
     console.log('Game Tied');
     gameOver = 'tied';
@@ -131,10 +145,15 @@ const game = (() => {
     }
   };
 
+  // Check if gameboard is filled completely
+  const checkFilled = (index) => !index == false;
+
   // Check for Ties, if all cells are filled and no win has been made, its a tie
   const checkTie = () => {
-  // if all cells are filled, with no winning combination, a tie has been reached
-  // run gameTied();
+    if (getGameOver() == false
+      && gameBoard.getBoard().every(checkFilled) == true) {
+      gameTie();
+    }
   };
 
   // Starts next round by printing new array, and announcing players turn
@@ -170,14 +189,55 @@ const game = (() => {
   };
 
   return {
-    getCurrentPlayer, switchPlayer, playRound, getGameOver,
+    getCurrentPlayer, switchPlayer, playRound, getGameOver, getWinner,
   };
 })();
 
 // displayController, reflects changes to the DOM
 const displayController = (() => {
-  // On page load, display player 1s name
-  DOM.gameMsg.innerText = `${game.getCurrentPlayer().name}'s turn!`;
+  // When game type has been chosen, hide game type menu, show name input
+  DOM.gameGrid.style.display = 'none';
+  DOM.gameMsg.innerText = '';
+  DOM.playerForm[0].style.display = 'none';
+
+  // Containers for player names entered through form
+  let playerOne = '';
+  let playerTwo = '';
+  const currentPlayer = '';
+
+  // PVP button functionality
+  DOM.pvpBtn[0].addEventListener('click', () => {
+    DOM.playerForm[0].style.display = 'grid';
+    DOM.gameType[0].style.display = 'none';
+  });
+
+  // PVC button functionality
+
+  // On submit for name input, hide all menus and show game grid, and show current player
+  // DOM.gameMsg.innerText = `${game.getCurrentPlayer().name}'s turn!`;
+  DOM.formSubmit[0].addEventListener('click', () => {
+    event.preventDefault();
+    DOM.playerForm[0].style.display = 'none';
+    DOM.gameGrid.style.display = 'grid';
+
+    // Update empty player variables, send through player factory function
+    playerOne = playerFactory(DOM.pOneInput.value, 'X');
+    playerTwo = playerFactory(DOM.pOneInput.value, 'O');
+
+    DOM.gameMsg.innerText = `${playerOne.name}'s turn!`;
+    return { playerOne, playerTwo };
+  });
+
+  // Takes player name from game module, ties it to player names from DOM form
+  const updatePlayerName = () => {
+    if (game.getCurrentPlayer().name == 'P One') {
+      currentPlayer = playerOne;
+      return (currentPlayer);
+    } if (game.getCurrentPlayer().name == 'P Two') {
+      currentPlayer = playerTwo;
+      return (currentPlayer);
+    }
+  };
 
   // When called, display who the current player is
   const updateGameMsg = () => {
@@ -186,7 +246,19 @@ const displayController = (() => {
 
   // Game Over Message
   const gameOverMsg = () => {
-    DOM.gameMsg.innerText = 'Game Over';
+    DOM.gameMsg.innerText = `${game.getWinner()} wins`;
+  };
+
+  // Tie Game Message
+  const tieGameMsg = () => {
+    DOM.gameMsg.innerText = 'Game Tied';
+  };
+
+  // Stop clickability of grid cells when game is over
+  const endFunctionality = () => {
+    gridCellArray.forEach((cell) => {
+      cell.disabled = true;
+    });
   };
 
   // End functionality of game when win state has been reached
@@ -194,8 +266,13 @@ const displayController = (() => {
   const gameOver = () => {
     if (game.getGameOver() == true) {
       gameOverMsg();
+      endFunctionality();
+    } else if (game.getGameOver() === 'tied') {
+      tieGameMsg();
+      endFunctionality();
     }
   };
+
   // Create an array from our DOM gridCell node list to iterate upon
   const gridCellArray = Array.from(DOM.gridCells);
 
