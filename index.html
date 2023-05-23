@@ -26,7 +26,7 @@
         </div>
 
         <div class="player-form hide" style="display:none">
-            <h1>Enter Player Names</h1>
+            <h1 class="form-header">Enter Player Names</h1>
             <form id="form" action="player-form" method="post" class="hide">
                 <label for="player1">Player One (X):</label>
                 <input type="text" id="player1" name="player1" placeholder="Player One" required>
@@ -34,7 +34,7 @@
                 <label for="player2">Player Two (O):</label>
                 <input type="text" id="player2" name="player2" placeholder="Player Two" required>
 
-                <button class="submit" type="submit">Submit</button>
+                <button class="submit" type="submit">Start Game</button>
             </form> 
         </div>
          
@@ -51,11 +51,19 @@
             <button class="grid-cell" data-index="8"></button>
         </div>
          
-       <button id="restart" style="display: none">New Game</button>
+       <button id="restart" style="display: none">New Round</button>
+
+       <div id="scoreboard">
+        <h1 class="scores">Scoreboard</h1>
+        <h1 id = "p1-label">Player One:</h1>
+        <h1 id = "p1-score"></h1>
+        <h1 id ="p2-label">Player Two:</h1>
+        <h1 id="p2-score"></h1>
+       </div>
         
     </main>
     <footer>
-        <p>Coded by Mike</p>
+        <p>Coded by MikeDev</p>
     </footer>
 <script src="index.js"></script>
 </body>

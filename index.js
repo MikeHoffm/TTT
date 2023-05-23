@@ -13,6 +13,11 @@ const DOM = {
   pTwoInput: document.getElementById('player2'),
   formSubmit: document.querySelectorAll('.submit'),
   restartBtn: document.getElementById('restart'),
+  scoreBoard: document.getElementById('scoreboard'),
+  pOneLabel: document.getElementById('p1-label'),
+  pTwoLabel: document.getElementById('p2-label'),
+  pOneScore: document.getElementById('p1-score'),
+  pTwoScore: document.getElementById('p2-score'),
 };
 
 // Gameboard , contains the board we'll make our play on,
@@ -82,10 +87,31 @@ const game = (() => {
   // Retrieve winner
   const getWinner = () => winningPlayer;
 
+  // Player Scores
+  let pOneScore = 0;
+  let pTwoScore = 0;
+
+  // Retrieve scores
+
+  const getPOneScore = () => pOneScore;
+  const getPTwoScore = () => pTwoScore;
+
+  const updateScore = () => {
+    if (winningPlayer == 'User One') {
+      ++pOneScore;
+      console.log(`Player one score is ${pOneScore}`);
+      return (pOneScore);
+    } if (winningPlayer == 'User Two') {
+      ++pTwoScore;
+      return (pTwoScore);
+    }
+  };
+
   // Method to run if a win has been made
   const endGame = () => {
     console.log(`${getCurrentPlayer().name} wins `);
     winningPlayer = getCurrentPlayer().name;
+    updateScore();
     gameOver = true;
     return { gameOver, winningPlayer };
   };
@@ -203,7 +229,7 @@ const game = (() => {
   };
 
   return {
-    getCurrentPlayer, switchPlayer, playRound, getGameOver, getWinner, newGame,
+    getCurrentPlayer, switchPlayer, playRound, getGameOver, getWinner, newGame, getPOneScore, getPTwoScore,
   };
 })();
 
@@ -211,6 +237,7 @@ const game = (() => {
 const displayController = (() => {
   // When game type has been chosen, hide game type menu, show name input
   DOM.gameGrid.style.display = 'none';
+  DOM.scoreBoard.style.display = 'none';
   DOM.gameMsg.innerText = '';
   DOM.playerForm[0].style.display = 'none';
 
@@ -231,15 +258,19 @@ const displayController = (() => {
   // DOM.gameMsg.innerText = `${game.getCurrentPlayer().name}'s turn!`;
   DOM.formSubmit[0].addEventListener('click', () => {
     event.preventDefault();
-    DOM.playerForm[0].style.display = 'none';
-    DOM.gameGrid.style.display = 'grid';
+    if (DOM.pOneInput.value == '' || DOM.pOneInput.value == '') {
+      alert('Please enter player names');
+    } else {
+      DOM.playerForm[0].style.display = 'none';
+      DOM.gameGrid.style.display = 'grid';
 
-    // Update empty player variables, send through player factory function
-    playerOne = playerFactory(DOM.pOneInput.value, 'X');
-    playerTwo = playerFactory(DOM.pTwoInput.value, 'O');
+      // Update empty player variables, send through player factory function
+      playerOne = playerFactory(DOM.pOneInput.value, 'X');
+      playerTwo = playerFactory(DOM.pTwoInput.value, 'O');
 
-    DOM.gameMsg.innerText = `${playerOne.name}'s turn!`;
-    return { playerOne, playerTwo };
+      DOM.gameMsg.innerText = `${playerOne.name}'s turn!`;
+      return { playerOne, playerTwo };
+    }
   });
 
   // Update player names from game module for DOM
@@ -266,7 +297,7 @@ const displayController = (() => {
     }
   };
 
-  // When called, display who the current player is
+  // Displays who the current player is
   const updateGameMsg = () => {
     updatePlayerName();
     DOM.gameMsg.innerText = `${currentPlayer.name}'s turn`;
@@ -283,7 +314,7 @@ const displayController = (() => {
     DOM.gameMsg.innerText = 'Game Tied';
   };
 
-  // Stop clickability of grid cells when game is over
+  // Stops clickability of grid cells when game is over
   const endFunctionality = () => {
     gridCellArray.forEach((cell) => {
       cell.disabled = true;
@@ -300,8 +331,18 @@ const displayController = (() => {
     }
   };
 
-  // New Game Functionality
+  // Updates player scores
+  // when a round is over, get the score of both players from game module
+  // update the DOM
+  const updateScoreboard = () => {
+    DOM.scoreBoard.style.display = 'grid';
+    DOM.pOneLabel.innerText = playerOne.name;
+    DOM.pTwoLabel.innerText = playerTwo.name;
+    DOM.pOneScore.innerText = game.getPOneScore();
+    DOM.pTwoScore.innerText = game.getPTwoScore();
+  };
 
+  // New Game Functionality
   const newGame = () => {
     DOM.restartBtn.style.display = 'grid';
 
@@ -315,28 +356,22 @@ const displayController = (() => {
       });
     });
   };
+
   // End functionality of game when win state has been reached
   // Change DOM msg
   const gameOver = () => {
     if (game.getGameOver() == true) {
       gameOverMsg();
       endFunctionality();
+      updateScoreboard();
       newGame();
     } else if (game.getGameOver() == 'tied') {
       tieGameMsg();
       endFunctionality();
+      updateScoreboard();
       newGame();
     }
   };
-
-  /* DOM.restartBtn.addEventListener('click', () => {
-    game.newGame();
-    updateGrid();
-    updateGameMsg();
-    gridCellArray.forEach((cell) => {
-      cell.disabled = false;
-    });
-  }); */
 
   // Each gridCell given a event handler, when clicked, playRound is called, marking
   // the array gameBoard at the same index as the grid cell being clicked
