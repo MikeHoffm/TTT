@@ -12,6 +12,7 @@ const DOM = {
   pOneInput: document.getElementById('player1'),
   pTwoInput: document.getElementById('player2'),
   formSubmit: document.querySelectorAll('.submit'),
+  restartBtn: document.getElementById('restart'),
 };
 
 // Gameboard , contains the board we'll make our play on,
@@ -170,6 +171,19 @@ const game = (() => {
     }
   };
 
+  // Clear gameBoard for start of new game
+  const newGame = () => {
+    for (let i = 0; i < gameBoard.getBoard().length; i++) {
+      gameBoard.getBoard()[i] = '';
+    }
+
+    winningPlayer = '';
+    currentPlayer = playerOne;
+    gameOver = false;
+
+    return (winningPlayer, currentPlayer);
+  };
+
   // Plays a round of Tic Tac Toe, marks board with current players token in given index
   // console.log the move made, switch player,
   // check win conditions
@@ -189,7 +203,7 @@ const game = (() => {
   };
 
   return {
-    getCurrentPlayer, switchPlayer, playRound, getGameOver, getWinner,
+    getCurrentPlayer, switchPlayer, playRound, getGameOver, getWinner, newGame,
   };
 })();
 
@@ -203,7 +217,7 @@ const displayController = (() => {
   // Containers for player names entered through form
   let playerOne = '';
   let playerTwo = '';
-  const currentPlayer = '';
+  let currentPlayer = '';
 
   // PVP button functionality
   DOM.pvpBtn[0].addEventListener('click', () => {
@@ -222,31 +236,46 @@ const displayController = (() => {
 
     // Update empty player variables, send through player factory function
     playerOne = playerFactory(DOM.pOneInput.value, 'X');
-    playerTwo = playerFactory(DOM.pOneInput.value, 'O');
+    playerTwo = playerFactory(DOM.pTwoInput.value, 'O');
 
     DOM.gameMsg.innerText = `${playerOne.name}'s turn!`;
     return { playerOne, playerTwo };
   });
 
-  // Takes player name from game module, ties it to player names from DOM form
+  // Update player names from game module for DOM
   const updatePlayerName = () => {
-    if (game.getCurrentPlayer().name == 'P One') {
+    if (game.getCurrentPlayer().name == 'User One') {
       currentPlayer = playerOne;
       return (currentPlayer);
-    } if (game.getCurrentPlayer().name == 'P Two') {
+    } if (game.getCurrentPlayer().name == 'User Two') {
       currentPlayer = playerTwo;
       return (currentPlayer);
     }
   };
 
+  // Update Winning player for DOM
+  let winner = '';
+
+  const updateWinnerName = () => {
+    if (game.getWinner() == 'User One') {
+      winner = playerOne.name;
+      return (winner);
+    } if (game.getWinner() == 'User Two') {
+      winner = playerTwo.name;
+      return (winner);
+    }
+  };
+
   // When called, display who the current player is
   const updateGameMsg = () => {
-    DOM.gameMsg.innerText = `${game.getCurrentPlayer().name}'s turn`;
+    updatePlayerName();
+    DOM.gameMsg.innerText = `${currentPlayer.name}'s turn`;
   };
 
   // Game Over Message
   const gameOverMsg = () => {
-    DOM.gameMsg.innerText = `${game.getWinner()} wins`;
+    updateWinnerName();
+    DOM.gameMsg.innerText = `${winner} wins`;
   };
 
   // Tie Game Message
@@ -261,18 +290,6 @@ const displayController = (() => {
     });
   };
 
-  // End functionality of game when win state has been reached
-  // Change DOM msg
-  const gameOver = () => {
-    if (game.getGameOver() == true) {
-      gameOverMsg();
-      endFunctionality();
-    } else if (game.getGameOver() === 'tied') {
-      tieGameMsg();
-      endFunctionality();
-    }
-  };
-
   // Create an array from our DOM gridCell node list to iterate upon
   const gridCellArray = Array.from(DOM.gridCells);
 
@@ -282,6 +299,44 @@ const displayController = (() => {
       gridCellArray[i].innerText = gameBoard.getBoard()[i];
     }
   };
+
+  // New Game Functionality
+
+  const newGame = () => {
+    DOM.restartBtn.style.display = 'grid';
+
+    DOM.restartBtn.addEventListener('click', () => {
+      game.newGame();
+      updateGrid();
+      updateGameMsg();
+      DOM.restartBtn.style.display = 'none';
+      gridCellArray.forEach((cell) => {
+        cell.disabled = false;
+      });
+    });
+  };
+  // End functionality of game when win state has been reached
+  // Change DOM msg
+  const gameOver = () => {
+    if (game.getGameOver() == true) {
+      gameOverMsg();
+      endFunctionality();
+      newGame();
+    } else if (game.getGameOver() == 'tied') {
+      tieGameMsg();
+      endFunctionality();
+      newGame();
+    }
+  };
+
+  /* DOM.restartBtn.addEventListener('click', () => {
+    game.newGame();
+    updateGrid();
+    updateGameMsg();
+    gridCellArray.forEach((cell) => {
+      cell.disabled = false;
+    });
+  }); */
 
   // Each gridCell given a event handler, when clicked, playRound is called, marking
   // the array gameBoard at the same index as the grid cell being clicked
